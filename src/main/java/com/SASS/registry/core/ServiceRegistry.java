@@ -20,8 +20,8 @@ import java.util.List;
 
 
 public class ServiceRegistry {
-    private static final String BASE_SERVICE_PATH = "/services";
-    private static final String BASE_FUNCTION_PATH = "/functions";
+    public static final String BASE_SERVICE_PATH = "/services";
+    public static final String BASE_FUNCTION_PATH = "/functions";
 
     private final ZooKeeper zk;
     private final ObjectMapper mapper = new ObjectMapper();
@@ -32,7 +32,7 @@ public class ServiceRegistry {
     }
 
     //确保节点存在。实例化zk的操作将交由ZooKeeperManager先行实现
-    public void initPaths() throws InterruptedException, KeeperException {
+    public void initPaths() {
         try{
             if(zk.exists(BASE_SERVICE_PATH,false) == null){
                 zk.create(BASE_SERVICE_PATH,new byte[0], ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
@@ -107,7 +107,7 @@ public class ServiceRegistry {
         return servers;
     }
     //获取支持对应功能的服务器的Id
-    private List<String> getServerIds(String functionId) throws InterruptedException, KeeperException, IOException {
+    public List<String> getServerIds(String functionId) throws InterruptedException, KeeperException, IOException {
         String funcPath = BASE_FUNCTION_PATH+"/"+functionId;
         if(zk.exists(funcPath,false) == null){
             return new ArrayList<>();
@@ -117,5 +117,9 @@ public class ServiceRegistry {
             return (data != null && data.length>0) ?
                     mapper.readValue(data,ArrayList.class) : new ArrayList<String>();
         }
+    }
+
+    public ObjectMapper getMapper() {
+        return mapper;
     }
 }
